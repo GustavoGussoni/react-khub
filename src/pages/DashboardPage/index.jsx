@@ -18,15 +18,7 @@ import { TechContext } from "../../providers/TechContext";
 import { DivModalEdit } from "../../components/Modal/Edit";
 
 export const DashboardPage = () => {
-  const {
-    techs,
-    user,
-    handleLogin,
-    onClick,
-    localStorageToken,
-    token,
-    GetUser,
-  } = useContext(UserContext);
+  const { techs, user, onClick } = useContext(UserContext);
 
   const {
     modal,
@@ -38,66 +30,61 @@ export const DashboardPage = () => {
     setIdEdit,
   } = useContext(TechContext);
 
-  GetUser(token);
   const userData = user;
 
-  if (localStorageToken) {
-    return (
-      <>
-        <CompHeader text="Sair" onClick={onClick}></CompHeader>
-        <DivMain>
-          <TitleOne color="--grey0">
-            {userData === null ? "Carregando nome" : `Olá, ${userData.name}`}
-          </TitleOne>
-          <HeadLineBold color="--grey1">
-            {userData === null ? "Carregando dados" : userData.course_module}
-          </HeadLineBold>
-        </DivMain>
-        <DivContent>
-          <TitleThree color="--grey0">Tecnologias</TitleThree>
-          <BttAdd
-            onClick={() => setModal(true)}
-            color="--grey3"
-            colorBg="--grey2"
-            fontColor="--white"
-          >
-            +
-          </BttAdd>
-        </DivContent>
+  return (
+    <>
+      <CompHeader text="Sair" onClick={onClick}></CompHeader>
+      <DivMain>
+        <TitleOne color="--grey0">
+          {userData === null ? "Carregando nome" : `Olá, ${userData.name}`}
+        </TitleOne>
+        <HeadLineBold color="--grey1">
+          {userData === null ? "Carregando dados" : userData.course_module}
+        </HeadLineBold>
+      </DivMain>
+      <DivContent>
+        <TitleThree color="--grey0">Tecnologias</TitleThree>
+        <BttAdd
+          onClick={() => setModal(true)}
+          color="--grey3"
+          colorBg="--grey2"
+          fontColor="--white"
+        >
+          +
+        </BttAdd>
+      </DivContent>
 
-        {modal === true ? <DivModal display="flex"></DivModal> : <></>}
-        {modalEdit === true ? (
-          <DivModalEdit infoInput={infoModal} display="flex"></DivModalEdit>
-        ) : (
-          <></>
-        )}
+      {modal === true ? <DivModal display="flex"></DivModal> : <></>}
+      {modalEdit === true ? (
+        <DivModalEdit infoInput={infoModal} display="flex"></DivModalEdit>
+      ) : (
+        <></>
+      )}
 
-        <DivList>
-          {userData === null
-            ? "Carregando dados"
-            : techs.length > 0
-            ? techs.map((el) => {
-                return (
-                  <CardTech
-                    onClick={() => {
-                      setModalEdit(true);
-                      setInfoModal(el.title);
-                      setIdEdit(el.id);
-                    }}
-                    key={el.id}
-                  >
-                    <TitleCard color="--white">{el.title}</TitleCard>
-                    <DivCardTech>
-                      <HeadLine color="--grey1">{el.status}</HeadLine>
-                    </DivCardTech>
-                  </CardTech>
-                );
-              })
-            : "Usuário ainda não possui tecnologias cadastradas"}
-        </DivList>
-      </>
-    );
-  } else if (localStorageToken === null) {
-    handleLogin();
-  }
+      <DivList>
+        {userData === null
+          ? "Carregando dados"
+          : techs.length > 0
+          ? techs.map((el) => {
+              return (
+                <CardTech
+                  onClick={() => {
+                    setModalEdit(true);
+                    setInfoModal(el.title);
+                    setIdEdit(el.id);
+                  }}
+                  key={el.id}
+                >
+                  <TitleCard color="--white">{el.title}</TitleCard>
+                  <DivCardTech>
+                    <HeadLine color="--grey1">{el.status}</HeadLine>
+                  </DivCardTech>
+                </CardTech>
+              );
+            })
+          : "Usuário ainda não possui tecnologias cadastradas"}
+      </DivList>
+    </>
+  );
 };

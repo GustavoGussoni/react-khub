@@ -19,7 +19,10 @@ export const CompFormRegister = () => {
       .required("Nome obrigatório")
       .min(2, "Deve ter no mínimo 2 caracteres")
       .max(18, "Deve ter no máximo 18 caracteres"),
-    email: yup.string().required("O email é obrigatório").email(),
+    email: yup
+      .string()
+      .required("O email é obrigatório")
+      .email("Deve ser um email válido"),
     password: yup
       .string()
       .required("Senha obrigatória")

@@ -2,7 +2,7 @@ import "./App.css";
 
 import { RoutesMain } from "./routes";
 
-function App() {
+export const App = () => {
   return (
     <>
       <div className="App">
@@ -10,6 +10,4 @@ function App() {
       </div>
     </>
   );
-}
-
-export default App;
+};

@@ -1,6 +1,6 @@
-import axios from "axios";
 import { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { api } from "../services/api";
 import { UserContext } from "./UserContexts";
 
 export const TechContext = createContext([]);
@@ -10,7 +10,7 @@ export const TechProvider = ({ children }) => {
   const [modal, setModal] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { techs, setTechs, setUser } = useContext(UserContext);
+  const { techs, setTechs, getUser } = useContext(UserContext);
   const [infoModal, setInfoModal] = useState("");
   const [idEdit, setIdEdit] = useState("");
 
@@ -20,65 +20,50 @@ export const TechProvider = ({ children }) => {
     },
   };
 
-  const onSubmitCreate = (data) => {
+  const onSubmitCreate = async (data) => {
     setLoading(true);
-    axios
-      .post("https://kenziehub.herokuapp.com/users/techs", { ...data }, token)
-      .then((res) => {
-        toast.success("Tecnologia cadastrada com sucesso!");
-        setTimeout(() => {
-          setLoading(false);
-          setModal(false);
-          setTechs([...techs, res.data]);
-        }, 2000);
-      })
-      .catch((err) => {
-        toast.error("Usuário ja possui essa tecnologia cadastrada!");
+
+    try {
+      const response = await api.post("/users/techs", data, token);
+
+      toast.success("Tecnologia cadastrada com sucesso!");
+      setTimeout(() => {
         setLoading(false);
         setModal(false);
-      });
+        setTechs([...techs, response.data]);
+      }, 2000);
+    } catch (error) {
+      toast.error("Usuário ja possui essa tecnologia cadastrada!");
+      setLoading(false);
+      setModal(false);
+    }
   };
 
-  const delTech = (id) => {
-    axios
-      .delete(`https://kenziehub.herokuapp.com/users/techs/${id}`, token)
-      .then((res) => {
-        toast.success("Tecnologia removida!");
-        const newTech = techs.filter((tec) => tec.id !== id);
-        setTechs(newTech);
-        setModalEdit(false);
-      })
-      .catch((err) => {
-        return err;
-      });
-  };
-  const GetUser = (data) => {
-    axios
-      .get("https://kenziehub.herokuapp.com/profile", data)
-      .then((res) => {
-        setUser(res.data);
-        setTechs(res.data.techs);
-      })
-      .catch((err) => {
-        return err;
-      });
+  const onSubmitEdit = async (data) => {
+    try {
+      const response = await api.put(`/users/techs/${idEdit}`, data, token);
+      toast.success("Tech editado com sucesso!");
+      getUser();
+      setModalEdit(false);
+      return response;
+    } catch (error) {
+      return error;
+    }
   };
 
-  const onSubmitEdit = (data) => {
-    axios
-      .put(
-        `https://kenziehub.herokuapp.com/users/techs/${idEdit}`,
-        { ...data },
-        token
-      )
-      .then((res) => {
-        toast.success("Tech editado com sucesso!");
-        GetUser(token);
-        setModalEdit(false);
-      })
-      .catch((err) => {
-        return err;
-      });
+  const delTech = async (id) => {
+    try {
+      const response = await api.delete(`/users/techs/${id}`, token);
+
+      toast.success("Tecnologia removida!");
+
+      const newTech = techs.filter((tec) => tec.id !== id);
+      setTechs(newTech);
+      setModalEdit(false);
+      return response;
+    } catch (error) {
+      return error;
+    }
   };
 
   return (

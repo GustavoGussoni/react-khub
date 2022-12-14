@@ -45,7 +45,7 @@ export const DivModalEdit = () => {
             <button onClick={() => setModalEdit(false)}>X</button>
           </div>
 
-          <FormModalEdit onSubmit={handleSubmit(onSubmitEdit)}>
+          <FormModalEdit onSubmit={(e) => e.preventDefault()}>
             <LabelTitle htmlFor="title" color="--grey0">
               Nome do projeto
             </LabelTitle>
@@ -77,6 +77,8 @@ export const DivModalEdit = () => {
                 colorBg="--color-primary-focus"
                 borderColor="--color-primary"
                 fontColor="--white"
+                type="submit"
+                onClick={handleSubmit(onSubmitEdit)}
               >
                 {loading ? (
                   <FaSpinner className="spinner-icon" />

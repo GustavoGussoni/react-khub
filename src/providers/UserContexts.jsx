@@ -1,7 +1,7 @@
-import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { api } from "../services/api";
 
 export const UserContext = createContext([]);
 
@@ -10,12 +10,6 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const localStorageToken = localStorage.getItem("authToken");
   const [techs, setTechs] = useState(null);
-
-  const token = {
-    headers: {
-      Authorization: "Bearer " + localStorageToken,
-    },
-  };
 
   const navigate = useNavigate();
   const handleHome = () => {
@@ -29,53 +23,54 @@ export const UserProvider = ({ children }) => {
     navigate("/");
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      const response = await api.post("/sessions", data);
+
+      localStorage.setItem("authToken", response.data.token);
+      setUser(response.data.user);
+      setTechs(response.data.user.techs);
+
+      api.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.token}`;
+
+      toast.success("Sucesso! Redirecionando.");
+      setTimeout(() => {
+        handleDashboard();
+      }, 2000);
+    } catch (error) {
+      toast.error("Erro! Email ou senha inválidos");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSubmitReg = async (data) => {
     setLoading(true);
 
-    axios
-      .post("https://kenziehub.herokuapp.com/sessions", { ...data })
-      .then((res) => {
-        window.localStorage.clear();
-        window.localStorage.setItem("authToken", res.data.token);
-        toast.success("Sucesso! Redirecionando.");
-        setTimeout(() => {
-          setLoading(false);
-          handleDashboard();
-        }, 5000);
-      })
-      .catch((err) => {
-        toast.error("Erro! Email ou senha inválidos");
+    try {
+      const response = await api.post("/users", data);
+      toast.success("Conta criada com sucesso!");
+      setTimeout(() => {
+        setLoading(false);
+        handleLogin();
+        return response;
+      }, 2000);
+    } catch (err) {
+      if (err.response.data.message === "Email already exists") {
+        toast.error("Ops! Esse email já existe!");
         setTimeout(() => {
           setLoading(false);
         }, 2000);
-      });
-  };
-
-  const onSubmitReg = (data) => {
-    setLoading(true);
-
-    axios
-      .post("https://kenziehub.herokuapp.com/users", { ...data })
-      .then((res) => {
-        toast.success("Conta criada com sucesso!");
+      } else {
+        toast.error("Ops! Algo deu errado.");
         setTimeout(() => {
           setLoading(false);
-          handleLogin();
-        }, 5000);
-      })
-      .catch((err) => {
-        if (err.response.data.message === "Email already exists") {
-          toast.error("Ops! Esse email já existe!");
-          setTimeout(() => {
-            setLoading(false);
-          }, 2000);
-        } else {
-          toast.error("Ops! Algo deu errado.");
-          setTimeout(() => {
-            setLoading(false);
-          }, 2000);
-        }
-      });
+        }, 2000);
+      }
+    }
   };
 
   const onClick = () => {
@@ -86,19 +81,24 @@ export const UserProvider = ({ children }) => {
     }, 3000);
   };
 
-  const GetUser = (data) => {
-    useEffect(() => {
-      axios
-        .get("https://kenziehub.herokuapp.com/profile", data)
-        .then((res) => {
-          setUser(res.data);
-          setTechs(res.data.techs);
-        })
-        .catch((err) => {
-          return err;
-        });
-    }, []);
+  const getUser = async () => {
+    const token = localStorage.getItem("authToken");
+
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    try {
+      const response = await api.get("/profile");
+
+      setUser(response.data);
+      setTechs(response.data.techs);
+    } catch (error) {
+      return error;
+    }
   };
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   return (
     <UserContext.Provider
@@ -112,8 +112,7 @@ export const UserProvider = ({ children }) => {
         setUser,
         onSubmitReg,
         handleLogin,
-        GetUser,
-        token,
+        getUser,
         localStorageToken,
         onClick,
         techs,
