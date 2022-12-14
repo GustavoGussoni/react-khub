@@ -3,48 +3,15 @@ import { DivHeadForm, FormRegister } from "./style";
 import * as yup from "yup";
 import { LabelTitle, SubTitle, TitleOne } from "../../../styles/typography";
 import { BttPrimary } from "../../Button";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FaSpinner } from "react-icons/fa";
 import { CompInput } from "../../Input/style";
+import { UserContext } from "../../../providers/UserContexts";
 
 export const CompFormRegister = () => {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const handleLogin = () => {
-    navigate("/");
-  };
-
-  const onSubmit = (data) => {
-    setLoading(true);
-
-    axios
-      .post("https://kenziehub.herokuapp.com/users", { ...data })
-      .then((res) => {
-        toast.success("Conta criada com sucesso!");
-        setTimeout(() => {
-          setLoading(false);
-          handleLogin();
-        }, 5000);
-      })
-      .catch((err) => {
-        if (err.response.data.message === "Email already exists") {
-          toast.error("Ops! Esse email já existe!");
-          setTimeout(() => {
-            setLoading(false);
-          }, 2000);
-        } else {
-          toast.error("Ops! Algo deu errado.");
-          setTimeout(() => {
-            setLoading(false);
-          }, 2000);
-        }
-      });
-  };
+  const { onSubmitReg, setLoading, loading } = useContext(UserContext);
 
   const formSchema = yup.object().shape({
     name: yup
@@ -56,8 +23,11 @@ export const CompFormRegister = () => {
     password: yup
       .string()
       .required("Senha obrigatória")
-      .matches(/(?=.*\d)/, "A senha deve conter ao menos um dígito")
-      .matches(/(?=.*[a-z])/, "A senha deve conter ao menos uma letra inúsculo")
+      .matches(/(?=.*\d)/, "A senha deve conter ao menos um número")
+      .matches(
+        /(?=.*[a-z])/,
+        "A senha deve conter ao menos uma letra minúscula"
+      )
       .matches(
         /(?=.*[A-Z])/,
         "A senha deve conter ao menos uma letra maiúscula"
@@ -66,10 +36,7 @@ export const CompFormRegister = () => {
         /(?=.*[$*&@#])/,
         "A senha deve conter ao menos um caractere especial"
       )
-      .matches(
-        /[0-9a-zA-Z$*&@#]{8,}/,
-        "A senha deve conter ao menos 8 caracteres"
-      ),
+      .matches(/[-\w@#$%]{8,}/, "A senha deve conter ao menos 8 caracteres"),
     passwordConfirmation: yup
       .string()
       .oneOf([yup.ref("password"), null], "As senhas devem ser iguais"),
@@ -92,7 +59,7 @@ export const CompFormRegister = () => {
 
   return (
     <>
-      <FormRegister onSubmit={handleSubmit(onSubmit)}>
+      <FormRegister onSubmit={handleSubmit(onSubmitReg)}>
         <DivHeadForm>
           <TitleOne color="--grey0">Crie sua conta</TitleOne>
           <SubTitle color="--grey1">Rapido e grátis, vamos nessa</SubTitle>

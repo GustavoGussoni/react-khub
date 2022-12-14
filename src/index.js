@@ -5,13 +5,22 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { GlobalStyles } from "./styles/global";
+import { UserProvider } from "./providers/UserContexts";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { TechProvider } from "./providers/TechContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <GlobalStyles></GlobalStyles>
-      <App />
+      <UserProvider>
+        <TechProvider>
+          <App />
+        </TechProvider>
+      </UserProvider>
+      <ToastContainer />
     </BrowserRouter>
   </React.StrictMode>
 );

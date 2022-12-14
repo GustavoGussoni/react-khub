@@ -37,3 +37,32 @@ export const BttSecondary = styled.button`
     background: var(${(props) => props.colorBg});
   }
 `;
+
+export const BttAdd = styled.button`
+  height: 32px;
+  width: 32px;
+  text-align: center;
+  background: var(${(props) => props.color});
+  color: var(${(props) => props.fontColor});
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 18px;
+
+  :hover {
+    background: var(${(props) => props.colorBg});
+  }
+`;
+
+export const BttDelete = styled.button`
+  height: 48px;
+  padding: 0 16.24px;
+  background: var(${(props) => props.color});
+  color: var(${(props) => props.fontColor});
+  border: none;
+  border-radius: 4px;
+
+  :hover {
+    background: var(${(props) => props.colorBg});
+  }
+`;

@@ -1,49 +1,16 @@
-import { useNavigate } from "react-router-dom";
 import { HeadLineBold, LabelTitle, TitleOne } from "../../../styles/typography";
 import { DivCreate, FormLogin } from "./style";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { useState } from "react";
+import { useContext } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { BttPrimary } from "../../Button";
 import { CompInput } from "../../Input/style";
+import { UserContext } from "../../../providers/UserContexts";
 
-export const CompFormLogin = ({ setLoginData }) => {
-  const [loading, setLoading] = useState(false);
-
-  const navigate = useNavigate();
-  const handleHome = () => {
-    navigate("/register");
-  };
-  const handleDashboard = () => {
-    navigate("/dashboard");
-  };
-
-  const onSubmit = (data) => {
-    setLoginData(data);
-    setLoading(true);
-
-    axios
-      .post("https://kenziehub.herokuapp.com/sessions", { ...data })
-      .then((res) => {
-        window.localStorage.clear();
-        window.localStorage.setItem("authToken", res.data.token);
-        toast.success("Sucesso! Redirecionando.");
-        setTimeout(() => {
-          setLoading(false);
-          handleDashboard();
-        }, 5000);
-      })
-      .catch((err) => {
-        toast.error("Erro! Email ou senha inválidos");
-        setTimeout(() => {
-          setLoading(false);
-        }, 2000);
-      });
-  };
+export const CompFormLogin = () => {
+  const { onSubmit, setLoading, loading, handleHome } = useContext(UserContext);
 
   const formSchema = yup.object().shape({
     email: yup
@@ -58,6 +25,7 @@ export const CompFormLogin = ({ setLoginData }) => {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(formSchema) });
+
   return (
     <FormLogin onSubmit={handleSubmit(onSubmit)}>
       <TitleOne color="--grey0">Login</TitleOne>

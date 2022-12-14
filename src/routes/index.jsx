@@ -3,17 +3,15 @@ import { DashboardPage } from "../pages/DashboardPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 
-export const RoutesMain = ({ setLoginData, setUser, user }) => {
+export const RoutesMain = () => {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<LoginPage setLoginData={setLoginData}></LoginPage>}
-      ></Route>
+      <Route path="/" element={<LoginPage></LoginPage>}></Route>
       <Route path="/register" element={<RegisterPage></RegisterPage>}></Route>
+
       <Route
         path="/dashboard"
-        element={<DashboardPage user={user} setUser={setUser}></DashboardPage>}
+        element={<DashboardPage></DashboardPage>}
       ></Route>
       <Route path="*" element={<Navigate to="/register"></Navigate>}></Route>
     </Routes>
