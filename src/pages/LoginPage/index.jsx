@@ -1,3 +1,4 @@
+import { Navigate } from "react-router-dom";
 import { CompFormLogin } from "../../components/Form/Login";
 
 import { Container } from "../../styles/global";
@@ -5,6 +6,8 @@ import { Container } from "../../styles/global";
 import { DivLogin, DivLogo } from "./style";
 
 export const LoginPage = ({ setLoginData }) => {
+  const token = localStorage.getItem("authToken");
+  if (token) return <Navigate to="/dashboard" replace />;
   return (
     <Container>
       <DivLogo>
